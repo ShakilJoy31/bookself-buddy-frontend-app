@@ -2,7 +2,12 @@ import '../styles/dashboard.css';
 
 import React from 'react';
 
+import { useGetBooksQuery } from '../redux/api/apiSlice';
+
 export const Books: React.FC<{}> = () => {
+    const {data, isLoading, error} = useGetBooksQuery(undefined);
+    console.log(data?.data);
+    console.log(error);
     return (
         <div>
             <div>

@@ -1,16 +1,56 @@
 import '../styles/componentStyle.css';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { RxCross1 } from 'react-icons/rx';
 
 export const AddNewBook: React.FC<{}> = () => {
+    const [bookName, setBookName] = useState('')
+    const [authorName, setAuthorName] = useState('')
+    const [genreName, setGenreName] = useState('')
+    const [publicationDate, setPublicationDate] = useState('');
+const [picture, setPicture] = useState<File | null>(null);
+
+    const [hostedImages, setHostedImages] = useState<string[]>([]);
+    const ImageStorageKey = "1f2e07ae412954d520f52351b07dee66";
+    const url = `https://api.imgbb.com/1/upload?key=${ImageStorageKey}`;
+    if (picture) {
+        const formDataImage = new FormData();
+        formDataImage.append("image", picture);
+        fetch(url, {
+            method: 'POST',
+            body: formDataImage,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                setHostedImages([result.data.display_url]);
+                setPicture(null);
+            });
+    }
+
+    const handleAddNewBook = () => {
+        const bookData = {
+            title: bookName,
+            author: authorName,
+            genre: genreName,
+            publicationDate: publicationDate,
+            bookPicture: hostedImages,
+            comments: []
+        }
+        console.log(bookData);
+    }
+
+    const handleRemoveImage = (getImage: string) => {
+        const restImage = hostedImages?.filter(img => img !== getImage);
+        setHostedImages(restImage);
+    }
     return (
         <div className={`pt-[24px] mx-2 md:mx-4 lg:mx-6`}>
         <div className={`blurre`}>
             <div className='flex lg:justify-end md:justify-end justify-center mb-2 gap-x-2'>
                 {
-                   <button style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
+                   <button onClick={handleAddNewBook} style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
                 }
 
             </div>
@@ -19,7 +59,7 @@ export const AddNewBook: React.FC<{}> = () => {
                 <div>
                     <span className=''>Book Name</span>
                     {
-                        <textarea style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md" /> 
+                        <textarea onChange={(e)=> setBookName(e.target.value)} style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md" placeholder='Type Book Name' /> 
                     }
                 </div>
             </div>
@@ -27,20 +67,9 @@ export const AddNewBook: React.FC<{}> = () => {
 
             <div>
                 <div>
-                    <span className=''>Cost for Hourly Hire</span>
+                    <span className=''>Author Name</span>
                     {
-                        <textarea style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md " placeholder='Type price' />
-                    }
-
-                </div>
-            </div>
-
-
-            <div>
-                <div>
-                    <span className=''>Cost for Daily Hire</span>
-                    {
-                        <textarea style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md" placeholder='Type old price' />
+                        <textarea onChange={(e)=> setAuthorName(e.target.value)} style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md " placeholder='Type Author Name' />
                     }
 
                 </div>
@@ -49,9 +78,20 @@ export const AddNewBook: React.FC<{}> = () => {
 
             <div>
                 <div>
-                    <span className=''>Cost for Longer-Term Hire</span>
+                    <span className=''>Genre Name</span>
                     {
-                        <textarea style={{ background: 'purple' }}  className="w-full pt-2 input focus:outline-none input-md " placeholder='Type offer here' />
+                        <textarea onChange={(e)=> setGenreName(e.target.value)} style={{ background: 'purple' }} className="w-full pt-2 input focus:outline-none input-md" placeholder='Type Genre Name' />
+                    }
+
+                </div>
+            </div>
+
+
+            <div>
+                <div>
+                    <span className=''>Publication Date</span>
+                    {
+                        <textarea onChange={(e)=> setPublicationDate(e.target.value)} style={{ background: 'purple' }}  className="w-full pt-2 input focus:outline-none input-md " placeholder='Type Publication Date' />
                     }
 
                 </div>
@@ -72,6 +112,12 @@ export const AddNewBook: React.FC<{}> = () => {
                             className={`customInputImageUpload w-[120px] h-[120px] hover:cursor-pointer`}
                         >
                             <input
+                            onChange={(e) => {
+                                const file = e.target.files?.[0]; // Null check added here
+                                if (file) {
+                                    setPicture(file);
+                                }
+                            }}
                                 style={{ position: "absolute", opacity: "0" }}
                                 type="file"
                                 className="h-[120px]"
@@ -81,20 +127,18 @@ export const AddNewBook: React.FC<{}> = () => {
                                 Click to upload
                             </p>
                         </div>
-                    </div>
 
-                    {/* <div className='grid w-full grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 my-[24px]'>
                         {
-                            hostedImages?.map((image, index) => <div key={index} style={{ position: relativePosition }}>
-                                <span onClick={() => handleRemoveImage(image)} style={{ position: 'absolute', top: '5px', right: '5px' }}><RxCross1 size={25} color={'red'}></RxCross1></span>
-                                <img
-                                    className="w-[120px] h-[120px] rounded-sm"
-                                    src={image}
-                                    alt=""
-                                />
-                            </div>)
+                            hostedImages.length > 0 && <div style={{ position: 'relative' }}>
+                            <span onClick={() => handleRemoveImage(hostedImages[0])} style={{ position: 'absolute', top: '5px', right: '5px' }}><RxCross1 size={25} color={'red'}></RxCross1></span>
+                            <img
+                                className="w-[120px] h-[120px] rounded-sm"
+                                src={hostedImages[0]}
+                                alt=""
+                            />
+                        </div>
                         }
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </div>
