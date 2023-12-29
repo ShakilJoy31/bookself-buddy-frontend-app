@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 
 export const Signup: React.FC<{}> = () => {
     const navigate = useNavigate();
-    const [password, setPassword] = useState('');
     const [isPasswordVasible, setIsPasswordVasible] = useState(true); 
 
     return (

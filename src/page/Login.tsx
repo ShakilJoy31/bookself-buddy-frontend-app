@@ -10,9 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const Login: React.FC<{}> = () => {
     const navigate = useNavigate();
-    const [password, setPassword] = useState('');
     const [isPasswordVasible, setIsPasswordVasible] = useState(true); 
-
     return (
         <div className='mt-[25px] mx-2 md:mx-4 lg:mx-6'>
             <div>
