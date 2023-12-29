@@ -1,11 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { INewBook } from '../../../types/globalTypes';
-
-interface IBook {
-    books: INewBook[];
-}
-
 const initialState = {
     books: []
 }

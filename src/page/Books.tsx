@@ -6,7 +6,7 @@ import { useGetBooksQuery } from '../redux/api/apiSlice';
 
 export const Books: React.FC<{}> = () => {
     const {data, isLoading, error} = useGetBooksQuery(undefined);
-    console.log(data?.data);
+    console.log(data?.data, isLoading);
     console.log(error);
     return (
         <div>
