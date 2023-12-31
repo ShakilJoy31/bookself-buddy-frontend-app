@@ -11,7 +11,7 @@ const baseUrl = 'https://bookself-buddy-backend-app.onrender.com/api/v1/bookself
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: `${baseUrl}` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${baseUrl}` }), 
   endpoints: (builder) => ({
     // ! Query Operations
     getBooks : builder.query({
