@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 
 import { FaPlus } from 'react-icons/fa';
+import { ImCross } from 'react-icons/im';
 import { TbAlertOctagonFilled } from 'react-icons/tb';
 import {
   useNavigate,
@@ -16,6 +17,7 @@ import {
 import {
   useDeleteBookMutation,
   useGetSingleBookMutation,
+  usePostCommentMutation,
 } from '../redux/api/apiSlice';
 import { useAppSelector } from '../redux/hook';
 import { Navbar } from './Navbar';
@@ -25,17 +27,26 @@ export const BookDetails: React.FC<{}> = () => {
     const { id } = useParams();
     let [getSingleBook, { data: singleBookData, isLoading: singleBookLoading }] = useGetSingleBookMutation();
     let [deleteBook, { data: deletedBookData, isLoading: deletedBookLoading }] = useDeleteBookMutation();
-
-    console.log(deletedBookLoading);
     console.log(deletedBookData);
-    const [individualBook, setIndividualBook] = useState(null)
+    let [postComment, { data, isLoading }] = usePostCommentMutation();
+    console.log(data, isLoading);
+
     const user = useAppSelector((state) => state.user.userInfo);
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);
-    console.log(individualBook);
+    const [isLoggedInUserForComment, setIsLoggedInUserForComment] = useState('');
+    console.log(user);
     useEffect(() => {
         getSingleBook(id);
-        setIndividualBook(singleBookData?.data);
     }, [])
+
+
+    useEffect(() => {
+        const userFromStorage = localStorage.getItem('bookself-buddy-user');
+        if (userFromStorage !== null) {
+            setIsLoggedInUserForComment(JSON.parse(userFromStorage).name);
+        }
+    }, [user])
+
     useEffect(() => {
         const userFromStorage = localStorage.getItem('bookself-buddy-user');
         if (userFromStorage !== null) {
@@ -57,14 +68,34 @@ export const BookDetails: React.FC<{}> = () => {
             navigate('/');
         }
     }
+
+    function getCurrentDateTime() {
+        const currentDate = new Date();
+        return currentDate.toLocaleString();
+    }
+
+    function generateFiveDigitNumber() {
+        const min = 10000;
+        const max = 99999;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+
+      const [userComment, setUserComment] = useState(''); 
+    const HandlePostingCommentOnBook = async () => {
+        const userCommentObject = {
+            commentId: generateFiveDigitNumber(),
+            name: isLoggedInUserForComment,
+            comment: userComment,
+            commentTime: getCurrentDateTime()
+        }
+        await postComment({ bookId: singleBookData?.data?._id, userCommentObject: userCommentObject })
+    }
+
     return (
         <div>
             <Navbar></Navbar>
             <div className='lg:px-16 md:px-10 px-3' data-aos="zoom-in-up">
-                {/* {
-                isCommentPermission && <p className='flex justify-center' style={{ padding: '5px', border: '1px solid crimson', background: 'rgba(220, 20, 60, 0.208)', marginTop: '10px' }}>{isCommentPermission}</p>
-            } */}
-
                 {
                     singleBookLoading ? <div>
                         <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
@@ -167,9 +198,16 @@ export const BookDetails: React.FC<{}> = () => {
                             <text x="50%" y="30" fill="url(#gradient)" textAnchor="middle">Comments and reviews</text>
                         </svg></h1>
 
-                        <span className={`plusCommnet`}><FaPlus size={25}></FaPlus></span>
+                        {
+                            isLoggedInUser && <span onClick={()=>{
+                                const modal = document.getElementById('readyToCommentModal') as HTMLDialogElement | null
+                                if (modal) {
+                                    modal.showModal();
+                                }
+                            }} className={`plusCommnet`}><FaPlus size={25}></FaPlus></span>
+                        }
+                        
                     </div>
-                    {/* <Divider color='crimson'></Divider> */}
                 </div>
 
             </div>
@@ -213,6 +251,45 @@ export const BookDetails: React.FC<{}> = () => {
                     <button>close</button>
                 </form>
             </dialog>
+
+
+
+            {/* Modal for comment */}
+            <dialog id="readyToCommentModal" className="modal">
+                    <div className={`toCommentModal modal-box`}>
+                        <div>
+                            <span onClick={()=>{
+                                const modal = document.getElementById('readyToCommentModal') as HTMLDialogElement | null
+                                if (modal) {
+                                    modal.close();
+                                }
+                            }} className='plusCommnet crossComment'><ImCross size={25}></ImCross></span>
+
+                        <span onClick={HandlePostingCommentOnBook} style={{ zIndex: '1' }} className={`postingComment w-[165px]`}><span className='flex justify-center'>Post</span></span>
+                        </div>
+
+                        <div className='mt-2'>
+                            <h1 className='my-2'>Leave your comment</h1>
+                            <div className={`flex items-center tableRoomInput`}>
+                                <textarea
+                                    onChange={(e)=> setUserComment(e.target.value)}
+                                    style={{
+                                        borderRadius: '8px',
+                                        background: 'white',
+                                    }}
+                                    placeholder={`Hi ${isLoggedInUserForComment} Please type your comment here`}
+                                    className={`w-full h-[55px] focus:outline-none border-0 pl-1 text-black`}
+                                    name=""
+                                    id=""
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="dialog" className="modal-backdrop">
+                        <button>close</button>
+                    </form>
+                </dialog>
 
         </div>
     )

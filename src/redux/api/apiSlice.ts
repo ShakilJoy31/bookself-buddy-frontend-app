@@ -43,6 +43,15 @@ export const api = createApi({
       method: "POST",
       body: {email: getData.email, password: getData.password}})
     }),
+    // POsting comment;
+    postComment: builder.mutation({
+      query: ({bookId, userCommentObject})=> ({
+      url: `/add-comment/${bookId}`,
+      method: "PUT",
+      body: {
+        userCommentObject
+      }})
+    }),
 
     // Delete Operation
     deleteBook: builder.mutation({
@@ -67,7 +76,7 @@ export const api = createApi({
 
   }),
 })
-export const { useGetBooksQuery, useGetSingleBookMutation, useAddUserMutation, useAddBookMutation, useGetSignedInUserMutation, useDeleteBookMutation, useUpdateBookMutation } = api;
+export const { useGetBooksQuery, useGetSingleBookMutation, useAddUserMutation, useAddBookMutation, useGetSignedInUserMutation, useDeleteBookMutation, useUpdateBookMutation, usePostCommentMutation } = api;
 
 
 // export const signupApi = createApi({
