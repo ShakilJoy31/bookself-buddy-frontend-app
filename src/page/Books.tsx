@@ -5,12 +5,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useGetBooksQuery } from '../redux/api/apiSlice';
+import { useAppSelector } from '../redux/hook';
 import { INewBook } from '../types/globalTypes';
 
 export const Books: React.FC<{}> = () => {
     const navigate = useNavigate();
-    const { data, isLoading } = useGetBooksQuery(undefined);
-    console.log(data?.data, isLoading);
+    const { isLoading } = useGetBooksQuery(undefined);
+    const theBooksFromDB = useAppSelector((state) => state.book.books);
     return (
         <div>
             <div>
@@ -46,46 +47,10 @@ export const Books: React.FC<{}> = () => {
                     <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
                     <p style={{ fontFamily: 'Lucida Sans Unicode' }} className='text-white flex justify-center'>Loading. Please wait...</p>
                 </div> : <div>
-                    {/* For mobile */}
-                    <div className='grid lg:hidden md:hidden grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-[24px] my-6 w-full' style={{ overflow: 'hidden' }}>
+                    {
+                        theBooksFromDB?.length < 1 ? <p style={{color: 'crimson'}} className='flex justify-center mt-4 lg:text-xl'>Sorry! No books found with the search name </p> : <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-[24px] py-6 w-full' style={{ overflow: 'hidden' }}>
                         {
-                            <div style={{
-                                borderRadius: '8px',
-                                border: '2px solid crimson'
-                            }} className={`w-full hover:cursor-pointer imageContainer productBackground`} data-aos="zoom-in-up">
-                                <div className={`imageContainer`}>
-                                    <figure><img className='lg:h-[220px] md:h-[200px] h-[180px]' src='https://bengaliebook.com/wp-content/uploads/2021/06/%E0%A6%AC%E0%A6%89-%E0%A6%A0%E0%A6%BE%E0%A6%95%E0%A7%81%E0%A6%B0%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%B0-%E0%A6%B9%E0%A6%BE%E0%A6%9F-768x1086.jpg' alt="Product Image" style={{ width: '100%', objectFit: 'cover', borderRadius: '0 8px 0 0' }} /></figure>
-                                </div>
-
-                                <div style={{ position: 'absolute', bottom: '5px', zIndex: '3' }} className="px-1 w-full">
-                                    <h2 className={`productTitle flex justify-center mb-[2px]`}>Bou thakuranir hat</h2>
-
-
-                                    <div className="flex justify-center w-full">
-                                        <p style={{ fontSize: '10px' }} className='text-slate-400'>Robindranath Tagor</p>
-                                    </div>
-                                </div>
-
-
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: '-2px',
-                                        left: '0',
-                                        width: '100%',
-                                        height: '50%',
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
-                                        zIndex: '2',
-                                    }}
-                                ></div>
-                            </div>
-                        }
-                    </div>
-
-                    {/* For Large device */}
-                    <div className='hidden lg:grid md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-[24px] my-6 w-full' style={{ overflow: 'hidden' }}>
-                        {
-                            data?.data?.map((book: INewBook, index:number)=> <div onClick={()=> navigate(`/books/${book._id}`)} key={index} style={{
+                            theBooksFromDB?.map((book: INewBook, index:number)=> <div onClick={()=> navigate(`/books/${book._id}`)} key={index} style={{
                                 borderRadius: '8px',
                                 border: '2px solid crimson'
                             }} className={`w-full hover:cursor-pointer imageContainer productBackground`} data-aos="zoom-in-up">
@@ -97,7 +62,13 @@ export const Books: React.FC<{}> = () => {
                                     <h2 className={`productTitle flex justify-center mb-[2px]`}>{book?.title}</h2>
 
                                     <div className="flex justify-center w-full">
-                                        <p style={{ fontSize: '13px' }} className='text-slate-400'>{book?.author}</p>
+                                        <p style={{ fontSize: '13px' }} className='text-slate-300'>{book?.author}</p>
+                                    </div>
+
+                                    <div className='flex justify-between items-center lg:px-2 md:px-2 px-1'>
+                                    <p style={{ fontSize: '13px' }} className='text-slate-500'>{book?.genre}</p>
+
+                                    <p style={{ fontSize: '13px' }} className='text-slate-500'>{book?.publicationDate}</p>
                                     </div>
                                 </div>
 
@@ -116,6 +87,8 @@ export const Books: React.FC<{}> = () => {
                             </div>)
                         }
                     </div>
+                    }
+                    
                 </div>
                 }
                 

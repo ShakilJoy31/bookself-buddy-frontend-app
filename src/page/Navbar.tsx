@@ -10,17 +10,22 @@ import { LuMenu } from 'react-icons/lu';
 import { TbAlertOctagonFilled } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 
+import { useGetBooksQuery } from '../redux/api/apiSlice';
+import { setBooks } from '../redux/features/book/bookSlice';
 import { setUser } from '../redux/features/user/userSlice';
 import {
   useAppDispatch,
   useAppSelector,
 } from '../redux/hook';
+import { INewBook } from '../types/globalTypes';
 
 export const Navbar: React.FC<{}> = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user.userInfo);
+    const { data } = useGetBooksQuery(undefined);
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+    dispatch(setBooks(data?.data));
     useEffect(() => {
         const userFromStorage = localStorage.getItem('bookself-buddy-user');
         if (userFromStorage !== null) {
@@ -28,18 +33,31 @@ export const Navbar: React.FC<{}> = () => {
         } else {
             setIsLoggedInUser(false);
         }
-        if(user){
+        if (user?.length > 0) {
             setIsLoggedInUser(true);
         }
     }, []);
+    console.log(isLoggedInUser);
     const logOutConfirmed = () => {
         dispatch(setUser(null))
         localStorage.removeItem('bookself-buddy-user')
         setIsLoggedInUser(false)
         const modal = document.getElementById('beforeLogoutModal') as HTMLDialogElement | null
-          if (modal) {
-              modal.close();
-          }
+        if (modal) {
+            modal.close();
+        }
+    }
+
+    const handleSearchForTheBooks = (getValue: string) => {
+        console.log(data);
+        const matchedBook = data?.data?.filter((book: INewBook) => (book.title).toLowerCase().match(getValue.toLowerCase()));
+        console.log(matchedBook);
+        if (!getValue) {
+            dispatch(setBooks(data?.data));
+        }
+        else {
+            dispatch(setBooks(matchedBook));
+        }
     }
 
     const drawer = <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>;
@@ -57,8 +75,14 @@ export const Navbar: React.FC<{}> = () => {
 
                             <div style={{ zIndex: '4' }} className="drawer-side">
                                 {drawer}
-                                <div className='min-h-screen bg-slate-500'>
-                                    <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>All Books</button>
+                                <div className='min-h-screen bg-slate-500 px-2'>
+                                    {
+                                        isLoggedInUser &&
+                                        <button onClick={() => {
+                                            navigate('/add-new-book')
+                                        }} className={`btn bg-white text-black border-0 btn-sm w-full lg:w-[100px] normal-case mt-4`}>+ Add New</button>
+                                    }
+                                    <button onClick={()=> navigate('/')} className={`btn border-0 btn-sm bg-white text-black w-full my-4 normal-case `}>All Books</button>
 
                                     {
                                         isLoggedInUser ? <button onClick={() => {
@@ -66,14 +90,15 @@ export const Navbar: React.FC<{}> = () => {
                                             if (modal) {
                                                 modal.showModal();
                                             }
-                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Logout</button> : <button onClick={() => {
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case IndividualProductBuyNowButton`}>Logout</button> :
+                                         <button onClick={() => {
                                             navigate('/login')
-                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case mb-4 bg-white text-black`}>Login</button>
                                     }
                                     {
                                         isLoggedInUser ? '' : <button onClick={() => {
                                             navigate('/signup')
-                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case text-black bg-white `}>Sign up</button>
                                     }
 
                                 </div>
@@ -102,11 +127,11 @@ export const Navbar: React.FC<{}> = () => {
 
                         <div>
                             <div style={{ borderRight: '1px solid crimson' }}>
-                                <input style={{ background: 'black', color: 'crimson', borderRight: '1px solid crimson' }} className="input focus:border-0 join-item" placeholder="Search" />
+                                <input onChange={(e) => handleSearchForTheBooks(e.target.value)} style={{ background: 'black', color: 'crimson', borderRight: '1px solid crimson' }} className="input focus:border-0 join-item focus:outline-none" placeholder="Search" />
                             </div>
                         </div>
 
-                        <select style={{ background: 'black', color: 'crimson' }} className="input focus:border-0 join-item">
+                        <select style={{ background: 'black', color: 'crimson' }} className="input focus:border-0 join-item focus:outline-none">
                             <option disabled selected>Filter by</option>
                             <option>Genre </option>
                             <option>Publication year</option>
@@ -144,11 +169,14 @@ export const Navbar: React.FC<{}> = () => {
 
                 {
                     <div className="lg:flex md:flex items-center hidden ml-2 gap-x-2">
-                        <button onClick={() => {
-                            navigate('/add-new-book')
-                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>+ Add New</button>
+                        {
+                            isLoggedInUser &&
+                            <button onClick={() => {
+                                navigate('/add-new-book')
+                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case bg-slate-400 hover:bg-white text-black`}>+ Add New</button>
+                        }
 
-                        <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>All Books</button>
+                        <button onClick={()=> navigate('/')} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case bg-slate-400 hover:bg-white text-black`}>All Books</button>
 
                         {
                             isLoggedInUser ? <button onClick={() => {
@@ -156,14 +184,14 @@ export const Navbar: React.FC<{}> = () => {
                                 if (modal) {
                                     modal.showModal();
                                 }
-                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Logout</button> : <button onClick={() => {
+                            }} className={`btn IndividualProductBuyNowButton border-0 btn-sm w-full lg:w-[100px] normal-case`}>Logout</button> : <button onClick={() => {
                                 navigate('/login')
-                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                            }} className={`btn bg-slate-400 hover:bg-white text-black border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
                         }
                         {
                             isLoggedInUser ? '' : <button onClick={() => {
                                 navigate('/signup')
-                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
+                            }} className={`btn bg-slate-400 hover:bg-white text-black border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
                         }
 
 

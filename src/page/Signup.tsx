@@ -20,11 +20,17 @@ export const Signup: React.FC<{}> = () => {
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
+    const [inValid, setINvalid] = useState('');
 
-    let [addUser, { data, isLoading }] = useAddUserMutation();
+    let [addUser, { data, isLoading, isError }] = useAddUserMutation();
     const [isSignIn, setInSignIn] = useState(false);
 
     const handleSignUpButton = async () => {
+        const modal = document.getElementById('signUpModal') as HTMLDialogElement | null
+        if (modal) {
+            modal.showModal();
+        }
+
         const userData = {
             name: name,
             email: email,
@@ -38,11 +44,18 @@ export const Signup: React.FC<{}> = () => {
         }
     }
     useEffect(()=>{
-        console.log(data);
+        if(isError){
+            setINvalid('Sorry! Failed to create user.');
+        }
         if (data?.status === 'success') {
+            setINvalid('User created successfully')
             setInSignIn(true);
             localStorage.setItem('bookself-buddy-user', JSON.stringify(data?.data))
             setTimeout(function () {
+                const modal = document.getElementById('signUpModal') as HTMLDialogElement | null
+                if (modal) {
+                    modal.close();
+                }
                 setInSignIn(false);
                 navigate('/')
             }, 2800);
@@ -50,7 +63,7 @@ export const Signup: React.FC<{}> = () => {
     },[data])
 
     return (
-        <div className='mt-[25px] mx-2 md:mx-4 lg:mx-6'>
+        <div className='pt-[25px] mx-2 md:mx-4 lg:mx-6'>
             <div>
                 {
                     (data?.status === 'success' && isSignIn) ? <p className='flex justify-center' style={{ padding: '5px', border: '1px solid crimson', background: 'rgba(220, 20, 60, 0.208)', marginTop: '-10px' }}>User created successfully</p> : ''
@@ -91,6 +104,29 @@ export const Signup: React.FC<{}> = () => {
                 }} className={`date hover:cursor-pointer flex justify-center`}>Already have an accounnt? Login</span>
             </div>
 
+
+            <dialog id="signUpModal" className="modal">
+                <div style={{
+                    color: 'white',
+                    background: 'black',
+                    border: '2px solid crimson'
+                }} className="modal-box">
+                    <div>
+                        {
+                            isLoading ? <div>
+                                <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
+                                {/* <span className="loading loading-ring loading-lg"></span> */}
+                                <p style={{ fontFamily: 'Lucida Sans Unicode' }} className='text-white flex justify-center'>Creating user. Please wait...</p>
+                            </div> : <h1 className="flex justify-center">{inValid}</h1>
+                        }
+
+                    </div>
+
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
         </div>
     )
 }

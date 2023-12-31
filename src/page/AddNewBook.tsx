@@ -33,6 +33,10 @@ const [picture, setPicture] = useState<File | null>(null);
     }
 
     const handleAddNewBook = async () => {
+            const modal = document.getElementById('bookSuccessfullyAddedModal') as HTMLDialogElement | null
+            if (modal) {
+                modal.showModal();
+            }
         const bookData = {
             title: bookName,
             author: authorName,
@@ -43,7 +47,13 @@ const [picture, setPicture] = useState<File | null>(null);
         }
         await addBook(bookData)
     }
-    console.log(data, isError);
+
+    setTimeout(function () {
+        const modal = document.getElementById('bookSuccessfullyAddedModal') as HTMLDialogElement | null
+        if (modal) {
+            modal.close();
+        }
+    }, 3800);
 
     const handleRemoveImage = (getImage: string) => {
         const restImage = hostedImages?.filter(img => img !== getImage);
@@ -53,13 +63,7 @@ const [picture, setPicture] = useState<File | null>(null);
         <div className={`pt-[24px] mx-2 md:mx-4 lg:mx-6`}>
         <div className={`blurre`}>
             <div className='flex lg:justify-end md:justify-end justify-center mb-2 gap-x-2'>
-                {
-                   isLoading ? <div>
-                   <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
-                   {/* <span className="loading loading-ring loading-lg"></span> */}
-                   <p style={{ fontFamily: 'Lucida Sans Unicode' }} className='text-white flex justify-center'>Loading. Please wait...</p>
-               </div> : <button onClick={handleAddNewBook} style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
-                }
+                   <button onClick={handleAddNewBook} style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] text-white px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
 
             </div>
 
@@ -151,6 +155,30 @@ const [picture, setPicture] = useState<File | null>(null);
             </div>
         </div>
 
+
+        {/* Model if book successfully added */}
+        <dialog id="bookSuccessfullyAddedModal" className="modal">
+                <div style={{
+                    color: 'white',
+                    background: 'black',
+                    border: '2px solid crimson'
+                }} className="modal-box">
+                    <div>
+                        {
+                            isLoading ? <div>
+                            <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
+                            {/* <span className="loading loading-ring loading-lg"></span> */}
+                            <p style={{ fontFamily: 'Lucida Sans Unicode' }} className='text-white flex justify-center'>Uploading book. Please wait...</p>
+                        </div> : <h1 className="flex justify-center">Book uploaded successfully.</h1>
+                        }
+                        
+                    </div>
+
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
 
         {/* <dialog id="alReadyExistsOnTheCartModal" className="modal" style={{ maxWidth: '480px', transform: 'translateX(-50%)', left: '50%' }}>
             <div style={{

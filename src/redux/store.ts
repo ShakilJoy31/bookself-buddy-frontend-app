@@ -9,7 +9,7 @@ import userReducer from './features/user/userSlice'; // Import the user slice
 const store = configureStore({
     reducer: {
         book: bookReducer,
-        user: userReducer,
+        user: userReducer, // Include the user slice in the store
         [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>

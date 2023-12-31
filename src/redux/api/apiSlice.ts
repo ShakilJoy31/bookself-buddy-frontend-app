@@ -4,10 +4,10 @@ import {
 } from '@reduxjs/toolkit/query/react';
 
 //! Production Url
-const baseUrl = 'https://bookself-buddy-backend-app.onrender.com/api/v1/bookself-user'
+// const baseUrl = 'https://bookself-buddy-backend-app.onrender.com/api/v1/bookself-user'
 
 //! Development Url
-// const baseUrl = 'http://localhost:5000/api/v1/bookself-user'
+const baseUrl = 'http://localhost:5000/api/v1/bookself-user'
 
 export const api = createApi({
   reducerPath: 'api',
@@ -17,11 +17,9 @@ export const api = createApi({
     getBooks : builder.query({
       query: () => `/get-books`,
     }),
-    getSingleBook : builder.query({
+    getSingleBook : builder.mutation({
       query: (id) => ({url: `/get-book/${id}`})
     }),
-
-
 
     // ! Mutation Operations
     addUser: builder.mutation({
@@ -46,13 +44,30 @@ export const api = createApi({
       body: {email: getData.email, password: getData.password}})
     }),
 
+    // Delete Operation
+    deleteBook: builder.mutation({
+      query: (deleteId) => ({
+        url: `/delete-book/${deleteId}`,
+        method: "DELETE",
+      }),
+    }),
+
+    // Update Operation
+    updateBook: builder.mutation({
+      query: ({ id, updatedData }) => ({
+        url: `/update-book/${id}`,
+        method: "PUT",
+        body: updatedData,
+      }),
+    }),
+    
 
 
 
 
   }),
 })
-export const { useGetBooksQuery, useGetSingleBookQuery, useAddUserMutation, useAddBookMutation, useGetSignedInUserMutation } = api;
+export const { useGetBooksQuery, useGetSingleBookMutation, useAddUserMutation, useAddBookMutation, useGetSignedInUserMutation, useDeleteBookMutation, useUpdateBookMutation } = api;
 
 
 // export const signupApi = createApi({
