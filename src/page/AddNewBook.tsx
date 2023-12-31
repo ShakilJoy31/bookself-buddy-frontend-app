@@ -5,7 +5,10 @@ import React, { useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { RxCross1 } from 'react-icons/rx';
 
+import { useAddBookMutation } from '../redux/api/apiSlice';
+
 export const AddNewBook: React.FC<{}> = () => {
+    let [addBook, { data, isLoading, isError }] = useAddBookMutation();
     const [bookName, setBookName] = useState('')
     const [authorName, setAuthorName] = useState('')
     const [genreName, setGenreName] = useState('')
@@ -29,7 +32,7 @@ const [picture, setPicture] = useState<File | null>(null);
             });
     }
 
-    const handleAddNewBook = () => {
+    const handleAddNewBook = async () => {
         const bookData = {
             title: bookName,
             author: authorName,
@@ -38,8 +41,9 @@ const [picture, setPicture] = useState<File | null>(null);
             bookPicture: hostedImages,
             comments: []
         }
-        console.log(bookData);
+        await addBook(bookData)
     }
+    console.log(data, isError);
 
     const handleRemoveImage = (getImage: string) => {
         const restImage = hostedImages?.filter(img => img !== getImage);
@@ -50,7 +54,11 @@ const [picture, setPicture] = useState<File | null>(null);
         <div className={`blurre`}>
             <div className='flex lg:justify-end md:justify-end justify-center mb-2 gap-x-2'>
                 {
-                   <button onClick={handleAddNewBook} style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
+                   isLoading ? <div>
+                   <span style={{ color: 'crimson' }} className="loading loading-ring w-24 h-24 block mx-auto"></span>
+                   {/* <span className="loading loading-ring loading-lg"></span> */}
+                   <p style={{ fontFamily: 'Lucida Sans Unicode' }} className='text-white flex justify-center'>Loading. Please wait...</p>
+               </div> : <button onClick={handleAddNewBook} style={{ background: 'purple', borderRadius: '5px' }} className="py-[5px] px-[3px] md:px-[3px] lg:px-[5px]">Upload Book</button>
                 }
 
             </div>

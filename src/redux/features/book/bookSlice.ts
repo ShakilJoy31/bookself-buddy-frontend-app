@@ -6,8 +6,12 @@ const initialState = {
 const bookSlice = createSlice({
     name: 'book',
     initialState,
-    reducers: {}
-})
+    reducers: {
+        setBooks: (state, action) => {
+            state.books = action.payload;
+        },
+        // Other reducers...
+    },
+});
 
-
-export default bookSlice.reducer; 
+export default bookSlice.reducer;

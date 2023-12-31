@@ -1,13 +1,44 @@
-import React from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
 import { BiSearch } from 'react-icons/bi';
 import { FaUserCircle } from 'react-icons/fa';
 // import { IoLogOut } from 'react-icons/io5';
 import { LuMenu } from 'react-icons/lu';
+import { TbAlertOctagonFilled } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
+
+import { setUser } from '../redux/features/user/userSlice';
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '../redux/hook';
 
 export const Navbar: React.FC<{}> = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.user.userInfo);
+    const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+    useEffect(() => {
+        const userFromStorage = localStorage.getItem('bookself-buddy-user');
+        if (userFromStorage !== null) {
+            setIsLoggedInUser(true);
+        } else {
+            setIsLoggedInUser(false);
+        }
+    }, []);
+    const logOutConfirmed = () => {
+        dispatch(setUser(null))
+        localStorage.removeItem('bookself-buddy-user')
+        setIsLoggedInUser(false)
+        const modal = document.getElementById('beforeLogoutModal') as HTMLDialogElement | null
+          if (modal) {
+              modal.close();
+          }
+    }
+
     const drawer = <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>;
     return (
         <div className='mx-2 md:mx-4 lg:mx-6'>
@@ -26,10 +57,22 @@ export const Navbar: React.FC<{}> = () => {
                                 <div className='min-h-screen bg-slate-500'>
                                     <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>All Books</button>
 
-                                    <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                                    {
+                                        isLoggedInUser ? <button onClick={() => {
+                                            const modal = document.getElementById('beforeLogoutModal') as HTMLDialogElement | null
+                                            if (modal) {
+                                                modal.showModal();
+                                            }
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Logout</button> : <button onClick={() => {
+                                            navigate('/login')
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                                    }
+                                    {
+                                        isLoggedInUser ? '' : <button onClick={() => {
+                                            navigate('/signup')
+                                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
+                                    }
 
-
-                                    <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
                                 </div>
                             </div>
                         </div>
@@ -98,24 +141,71 @@ export const Navbar: React.FC<{}> = () => {
 
                 {
                     <div className="lg:flex md:flex items-center hidden ml-2 gap-x-2">
-                        <button onClick={()=>{
+                        <button onClick={() => {
                             navigate('/add-new-book')
                         }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>+ Add New</button>
 
                         <button className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>All Books</button>
 
-                        <button onClick={()=> {
-                            navigate('/login')
-                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                        {
+                            isLoggedInUser ? <button onClick={() => {
+                                const modal = document.getElementById('beforeLogoutModal') as HTMLDialogElement | null
+                                if (modal) {
+                                    modal.showModal();
+                                }
+                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Logout</button> : <button onClick={() => {
+                                navigate('/login')
+                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Login</button>
+                        }
+                        {
+                            isLoggedInUser ? '' : <button onClick={() => {
+                                navigate('/signup')
+                            }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
+                        }
 
 
-                        <button onClick={()=> {
-                            navigate('/signup')
-                        }} className={`btn border-0 btn-sm w-full lg:w-[100px] normal-case`}>Sign up</button>
                     </div>
                 }
 
             </div>
+
+            {/* Before logout */}
+            <dialog id="beforeLogoutModal" className="modal">
+                <div style={{
+                    color: 'white',
+                    background: 'black',
+                    border: '2px solid crimson'
+                }} className="modal-box">
+                    <div>
+                        <h3 className="flex justify-center text-white items-center gap-x-2"><span><TbAlertOctagonFilled size={30} color={'crimson'}></TbAlertOctagonFilled></span> <span>Hey, Attention please!</span></h3>
+                        <h1 className="flex justify-center">Do you want to log out?</h1>
+                        <div className='flex justify-between items-center mt-[24px]'>
+                            <div onClick={() => {
+                                const modal = document.getElementById('beforeLogoutModal') as HTMLDialogElement | null
+                                if (modal) {
+                                    modal.close();
+                                }
+                            }}>
+                                <button className={`btn border-0 btn-sm bg-slate-400 hover:bg-white text-black w-[150px] normal-case `}>Cancel</button>
+                            </div>
+
+                            <div onClick={logOutConfirmed} className={`theButton`}>
+                                {
+                                    <button className={`btn border-0 btn-sm w-[150px] normal-case IndividualProductBuyNowButton`}>Log out</button>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+
 
         </div>
     )
