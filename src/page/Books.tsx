@@ -9,7 +9,7 @@ import { INewBook } from '../types/globalTypes';
 
 export const Books: React.FC<{}> = () => {
     const navigate = useNavigate();
-    const { data, isLoading, isError } = useGetBooksQuery(undefined);
+    const { data, isLoading } = useGetBooksQuery(undefined);
     console.log(data?.data, isLoading);
     return (
         <div>

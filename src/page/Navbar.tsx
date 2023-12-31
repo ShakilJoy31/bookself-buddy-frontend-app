@@ -28,6 +28,9 @@ export const Navbar: React.FC<{}> = () => {
         } else {
             setIsLoggedInUser(false);
         }
+        if(user){
+            setIsLoggedInUser(true);
+        }
     }, []);
     const logOutConfirmed = () => {
         dispatch(setUser(null))
