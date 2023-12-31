@@ -8,7 +8,7 @@ import { RxCross1 } from 'react-icons/rx';
 import { useAddBookMutation } from '../redux/api/apiSlice';
 
 export const AddNewBook: React.FC<{}> = () => {
-    let [addBook, { data, isLoading, isError }] = useAddBookMutation();
+    let [addBook, { isLoading }] = useAddBookMutation();
     const [bookName, setBookName] = useState('')
     const [authorName, setAuthorName] = useState('')
     const [genreName, setGenreName] = useState('')
