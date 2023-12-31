@@ -4,10 +4,10 @@ import {
 } from '@reduxjs/toolkit/query/react';
 
 //! Production Url
-// const baseUrl = 'https://bookself-buddy-backend-app.onrender.com/api/v1/bookself-user'
+const baseUrl = 'https://bookself-buddy-backend-app.onrender.com/api/v1/bookself-user'
 
 //! Development Url
-const baseUrl = 'http://localhost:5000/api/v1/bookself-user'
+// const baseUrl = 'http://localhost:5000/api/v1/bookself-user'
 
 export const api = createApi({
   reducerPath: 'api',
